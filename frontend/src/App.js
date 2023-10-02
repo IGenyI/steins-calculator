@@ -1,5 +1,3 @@
-// src/App.js
-
 import React, { useState } from 'react';
 import { Route, Routes, Link, Navigate, Outlet, useNavigate } from 'react-router-dom';
 
@@ -26,6 +24,7 @@ function App () {
 	};
 
 	const handleLogin = async ( username, password ) => {
+		
 		try {
 			const response = await fetch( `${ apiUrl }/login`, {
 				method: 'POST',
@@ -69,6 +68,7 @@ function App () {
 			</div>
 	);
 }
+
 
 function Login ( { onLogin } ) {
 	const [ username, setUsername ] = useState( '' );
