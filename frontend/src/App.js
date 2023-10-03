@@ -60,7 +60,7 @@ function App () {
 
 	return (
 		<div className="App">
-			<h1>Authentication Example</h1>
+			<h1>Authentication</h1>
 			<nav>
 				<ul>
 					<li>
