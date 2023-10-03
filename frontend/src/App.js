@@ -25,8 +25,12 @@ function App () {
 	const apiUrl = 'http://localhost:3001/api'; 
 
 	const handleRegister = async ( username, password ) => {
-		const formData = { username, password };
-		registerSchema.parse( formData );
+		try {
+			const formData = { username, password };
+			registerSchema.parse( formData );
+		} catch (error) {
+			setRegisterError("Invalid credentials");
+		}
 		try {
 			const response = await fetch( `${ apiUrl }/register`, {
 				method: 'POST',
@@ -35,9 +39,9 @@ function App () {
 			} );
 			const data = await response.json();
 			if (!response.ok) {
-				setRegisterError(data.message); // Set the error message
+				setRegisterError(data.message);
 			} else {
-				setRegisterError(''); // Clear any previous error message
+				setRegisterError(data.message);
 				console.log(data.message);
 			}
 		} catch ( error ) {
@@ -46,8 +50,12 @@ function App () {
 	};
 
 	const handleLogin = async ( username, password ) => {
-		const formData = { username, password };
-		loginSchema.parse( formData );
+		try {
+			const formData = { username, password };
+			loginSchema.parse( formData );
+		} catch (error) {
+			setLoginError("Invalid credentials");
+		}
 		try {
 			const response = await fetch( `${ apiUrl }/login`, {
 				method: 'POST',
