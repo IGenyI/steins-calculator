@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
 import { Route, Routes, Link, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import z from 'zod';
+
+const loginSchema = z.object( {
+	username: z.string(),
+	password: z.string().min( 6 ) 
+} );
+
+const registerSchema = z.object( {
+	username: z.string(),
+	password: z.string().min( 8 )
+} );
 
 function App () {
 	const [ token, setToken ] = useState( '' );
 	const navigate = useNavigate();
 
-
 	// Replace with your backend API URL
-	const apiUrl = 'http://localhost:3001/api';
+	const apiUrl = 'http://localhost:3001/api'; 
 
 	const handleRegister = async ( username, password ) => {
+		const formData = { username, password };
+		registerSchema.parse( formData );
 		try {
 			const response = await fetch( `${ apiUrl }/register`, {
 				method: 'POST',
@@ -24,7 +36,8 @@ function App () {
 	};
 
 	const handleLogin = async ( username, password ) => {
-		
+		const formData = { username, password };
+		loginSchema.parse( formData );
 		try {
 			const response = await fetch( `${ apiUrl }/login`, {
 				method: 'POST',
@@ -35,7 +48,7 @@ function App () {
 			if ( response.ok ) {
 				console.log( data.token );
 				setToken( data.token );
-				navigate('/private/application');
+				navigate( '/private/application' );
 			} else {
 				console.log( data.message );
 			}
@@ -45,27 +58,27 @@ function App () {
 	};
 
 	return (
-			<div className="App">
-				<h1>Authentication Example</h1>
-				<nav>
-					<ul>
-						<li>
-							<Link to="/login">Login</Link>
-						</li>
-						<li>
-							<Link to="/register">Register</Link>
-						</li>
-					</ul>
-				</nav>
-				<Routes>
-					<Route path="/login" element={ <Login onLogin={ handleLogin } /> } />
-					<Route path="/register" element={ <Register onRegister={ handleRegister } /> } />
-					<Route path="/private" element={ <PrivateRoute token={ token } /> } >
-						<Route path='application' element={<Application/>}/>
-					</Route>
-					<Route index element={ <Navigate to="/login" /> } />
-				</Routes>
-			</div>
+		<div className="App">
+			<h1>Authentication Example</h1>
+			<nav>
+				<ul>
+					<li>
+						<Link to="/login">Login</Link>
+					</li>
+					<li>
+						<Link to="/register">Register</Link>
+					</li>
+				</ul>
+			</nav>
+			<Routes>
+				<Route path="/login" element={ <Login onLogin={ handleLogin } /> } />
+				<Route path="/register" element={ <Register onRegister={ handleRegister } /> } />
+				<Route path="/private" element={ <PrivateRoute token={ token } /> } >
+					<Route path='application' element={ <Application /> } />
+				</Route>
+				<Route index element={ <Navigate to="/login" /> } />
+			</Routes>
+		</div>
 	);
 }
 
@@ -136,7 +149,7 @@ function PrivateRoute ( { token } ) {
 	return token ? <Outlet /> : <Navigate to="/login" />;
 }
 
-function Application() {
+function Application () {
 	return (
 		<div>
 			<h1>Application</h1>
