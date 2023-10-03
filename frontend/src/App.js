@@ -13,9 +13,13 @@ const registerSchema = z.object( {
 	password: z.string().min( 8 )
 } );
 
+
 function App () {
 	const [ token, setToken ] = useState( '' );
 	const navigate = useNavigate();
+	const [loginError, setLoginError] = useState('');
+	const [registerError, setRegisterError] = useState('');
+
 
 	// Replace with your backend API URL
 	const apiUrl = 'http://localhost:3001/api'; 
@@ -30,7 +34,12 @@ function App () {
 				body: JSON.stringify( { username, password } ),
 			} );
 			const data = await response.json();
-			console.log( data.message );
+			if (!response.ok) {
+				setRegisterError(data.message); // Set the error message
+			} else {
+				setRegisterError(''); // Clear any previous error message
+				console.log(data.message);
+			}
 		} catch ( error ) {
 			console.error( 'Error:', error );
 		}
@@ -46,12 +55,13 @@ function App () {
 				body: JSON.stringify( { username, password } ),
 			} );
 			const data = await response.json();
-			if ( response.ok ) {
-				console.log( data.token );
-				setToken( data.token );
-				navigate( '/private/application' );
+			if (!response.ok) {
+				setLoginError(data.message); 
 			} else {
-				console.log( data.message );
+				setLoginError(''); 
+				console.log(data.token);
+				setToken(data.token);
+				navigate('/private/application');
 			}
 		} catch ( error ) {
 			console.error( 'Error:', error );
@@ -72,8 +82,8 @@ function App () {
 				</ul>
 			</nav>
 			<Routes>
-				<Route path="/login" element={ <Login onLogin={ handleLogin } /> } />
-				<Route path="/register" element={ <Register onRegister={ handleRegister } /> } />
+				<Route path="/login" element={ <Login onLogin={ handleLogin } loginError={loginError} /> } />
+				<Route path="/register" element={ <Register onRegister={ handleRegister } registerError={registerError} /> } />
 				<Route path="/private" element={ <PrivateRoute token={ token } /> } >
 					<Route path='application' element={ <Application /> } />
 				</Route>
@@ -84,7 +94,7 @@ function App () {
 }
 
 
-function Login ( { onLogin } ) {
+function Login ( { onLogin, loginError } ) {
 	const [ username, setUsername ] = useState( '' );
 	const [ password, setPassword ] = useState( '' );
 
@@ -109,13 +119,16 @@ function Login ( { onLogin } ) {
 					value={ password }
 					onChange={ ( e ) => setPassword( e.target.value ) }
 				/>
+
+				{loginError && <div className="error">{loginError}</div>}
+				
 				<button type="submit">Login</button>
 			</form>
 		</div>
 	);
 }
 
-function Register ( { onRegister } ) {
+function Register ( { onRegister, registerError } ) {
 	const [ username, setUsername ] = useState( '' );
 	const [ password, setPassword ] = useState( '' );
 
@@ -140,6 +153,7 @@ function Register ( { onRegister } ) {
 					value={ password }
 					onChange={ ( e ) => setPassword( e.target.value ) }
 				/>
+				 {registerError && <div className="error">{registerError}</div>}
 				<button type="submit">Register</button>
 			</form>
 		</div>
